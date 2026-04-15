@@ -1,0 +1,82 @@
+[project]
+name = "pyclay"
+version = "0.14.0-alpha"
+description = "Python bindings for Nic Barker's Clay, a high performance UI layout library in C."
+readme = "README.md"
+authors = [
+    { name = "Alexandr Gorbatenko", email = "official.oxygen.1771@gmail.com" }
+]
+license = "zlib-acknowledgement"
+license-files = ["LICENSE*"]
+requires-python = ">=3.14"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "pytest-mock>=3.15.1",
+    "ruff>=0.15.10",
+    "scikit-build-core>=0.12.2",
+    "ty>=0.0.29",
+]
+
+
+# --- BUILD ---
+
+[build-system]
+requires = ["scikit-build-core>=0.12.2"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+cmake.source-dir = "."
+cmake.args = ["-DCLAY_INCLUDE_ALL_EXAMPLES=OFF"]
+
+
+# --- TOOLS ---
+
+[tool.ruff]
+target-version = "py314"
+
+[tool.ruff.lint]
+preview = true
+extend-select = [
+    "B",   # flake8-bugbear
+    "A",   # flake8-builtins
+    "COM", # flake8-commas
+    "C4",  # flake8-comprehensions
+    "FIX", # flake8-fixme
+    "PT",  # flake8-pytest-style
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "TD",  # flake8-todos
+
+    "I",   # isort
+    "N",   # pep8-naming
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    # "DOC", # pydoclint - no sphinx docstring format support yet
+    "D",   # pydocstyle
+    "F",   # Pyflakes
+    "UP",  # pyupgrade
+    "PGH", # pygrep-hooks
+
+    "RUF", # ruff-specific
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pyclay"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+skip-magic-trailing-comma = false
+# same as in .editorconfig
+indent-style = "space"
+line-ending = "lf"
+
+
+[tool.ty.src]
+include = ["src", "tests"]

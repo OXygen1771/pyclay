@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+dist/
+wheels/
+*.egg-info
+
+# Build directory when not isolating builds
+build/
+
+# Virtual environments
+.venv
+
+# IDE
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Pytest coverage
+.coverage
