@@ -1,10 +1,3 @@
-The original Clay UI library is licensed under the
-[`zlib/libpng` license](https://github.com/nicbarker/clay/blob/main/LICENSE.md),
-the full license notice may also be found at the bottom of
-[clay.h](./clay/clay.h#L4924).
-Pyclay is also licensed under the same `zlib/libpng` license, see below:
-
-
 zlib/libpng license
 
 Copyright (c) 2026 Alexandr Oxygen
