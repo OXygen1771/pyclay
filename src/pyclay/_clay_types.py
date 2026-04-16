@@ -5,7 +5,6 @@ from ctypes import (
     POINTER,
     Structure,
     Union,
-    _CFunctionType,
     _Pointer,
     c_bool,
     c_char_p,
@@ -346,14 +345,14 @@ class Clay_TransitionElementConfig(Structure):
     """Controls transitions."""
 
     # bool (*handler)(Clay_TransitionCallbackArguments arguments)
-    _handler: type[_CFunctionType] = CFUNCTYPE(c_bool, Clay_TransitionCallbackArguments)
+    _handler = CFUNCTYPE(c_bool, Clay_TransitionCallbackArguments)
 
     class _enter(Structure):
         # Clay_TransitionData (*setInitialState)(
         #   Clay_TransitionData targetState,
         #   Clay_TransitionProperty properties
         # )
-        _setInitialState: type[_CFunctionType] = CFUNCTYPE(  # noqa: N815
+        _setInitialState = CFUNCTYPE(  # noqa: N815
             Clay_TransitionData,
             Clay_TransitionData,
             c_uint32,
@@ -369,7 +368,7 @@ class Clay_TransitionElementConfig(Structure):
         #   Clay_TransitionData initialState,
         #   Clay_TransitionProperty properties
         # )
-        _setFinalState: type[_CFunctionType] = CFUNCTYPE(  # noqa: N815
+        _setFinalState = CFUNCTYPE(  # noqa: N815
             Clay_TransitionData,
             Clay_TransitionData,
             c_uint32,
@@ -564,7 +563,7 @@ class Clay_ErrorData(Structure):
 class Clay_ErrorHandler(Structure):
     """Wrapper struct around Clay's error handler function."""
 
-    _errorHandlerFunction: type[_CFunctionType] = CFUNCTYPE(None, Clay_ErrorData)  # noqa: N815
+    _errorHandlerFunction = CFUNCTYPE(None, Clay_ErrorData)  # noqa: N815
 
     _fields_ = (
         ("errorHandlerFunction", _errorHandlerFunction),
@@ -573,3 +572,41 @@ class Clay_ErrorHandler(Structure):
 
 
 # ruff: enable[N801]
+# ruff: disable[N816]
+
+# --- Function pointers ---
+
+# void (*onHoverFunction)(
+#   Clay_ElementId elementId,
+#   Clay_PointerData pointerData,
+#   void *userData
+# )
+onHoverFunction = CFUNCTYPE(
+    None,
+    Clay_ElementId,
+    Clay_PointerData,
+    c_void_p,
+)
+
+# Clay_Dimensions (*measureTextFunction)(
+#   Clay_StringSlice text,
+#   Clay_TextElementConfig *config,
+#   void *userData
+# )
+measureTextFunction = CFUNCTYPE(
+    Clay_Dimensions,
+    Clay_StringSlice,
+    Clay_TextElementConfig,
+    c_void_p,
+)
+
+# Clay_Vector2 (*queryScrollOffsetFunction)(
+#   uint32_t elementId,
+#   void *userData
+# )
+queryScrollOffsetFunction = CFUNCTYPE(
+    c_uint32,
+    Clay_TextElementConfig,
+)
+
+# ruff: enable[N816]

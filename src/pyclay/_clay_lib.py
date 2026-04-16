@@ -4,9 +4,7 @@ import ctypes
 import importlib.util
 from ctypes import (
     CDLL,
-    CFUNCTYPE,
     POINTER,
-    _CFunctionType,
     _Pointer,
     c_bool,
     c_float,
@@ -108,7 +106,7 @@ class _ClayLib:
         lib.Clay_Hovered.argtypes = []
         lib.Clay_Hovered.restype = c_bool
 
-        lib.Clay_OnHover.argtypes = [onHoverFunction, c_void_p]
+        lib.Clay_OnHover.argtypes = [ct.onHoverFunction, c_void_p]
         lib.Clay_OnHover.restype = None
 
         lib.Clay_PointerOver.argtypes = [ct.Clay_ElementId]
@@ -120,11 +118,11 @@ class _ClayLib:
         lib.Clay_GetScrollContainerData.argtypes = [ct.Clay_ElementId]
         lib.Clay_GetScrollContainerData.restype = ct.Clay_ScrollContainerData
 
-        lib.Clay_SetMeasureTextFunction.argtypes = [measureTextFunction, c_void_p]
+        lib.Clay_SetMeasureTextFunction.argtypes = [ct.measureTextFunction, c_void_p]
         lib.Clay_SetMeasureTextFunction.restype = None
 
         lib.Clay_SetQueryScrollOffsetFunction.argtypes = [
-            queryScrollOffsetFunction,
+            ct.queryScrollOffsetFunction,
             c_void_p,
         ]
         lib.Clay_SetQueryScrollOffsetFunction.restype = None
@@ -203,42 +201,6 @@ class _ClayLib:
 # singleton library instance. couldn't think of a better way to do it...
 _clay: _ClayLib = _ClayLib()
 _lib: CDLL = _clay.lib
-
-
-# --- Function pointers ---
-
-# void (*onHoverFunction)(
-#   Clay_ElementId elementId,
-#   Clay_PointerData pointerData,
-#   void *userData
-# )
-onHoverFunction: type[_CFunctionType] = CFUNCTYPE(  # noqa: N816
-    None,
-    ct.Clay_ElementId,
-    ct.Clay_PointerData,
-    c_void_p,
-)
-
-# Clay_Dimensions (*measureTextFunction)(
-#   Clay_StringSlice text,
-#   Clay_TextElementConfig *config,
-#   void *userData
-# )
-measureTextFunction: type[_CFunctionType] = CFUNCTYPE(  # noqa: N816
-    ct.Clay_Dimensions,
-    ct.Clay_StringSlice,
-    ct.Clay_TextElementConfig,
-    c_void_p,
-)
-
-# Clay_Vector2 (*queryScrollOffsetFunction)(
-#   uint32_t elementId,
-#   void *userData
-# )
-queryScrollOffsetFunction: type[_CFunctionType] = CFUNCTYPE(  # noqa: N816
-    c_uint32,
-    ct.Clay_TextElementConfig,
-)
 
 
 # --- Public API functions ---
@@ -332,7 +294,7 @@ def clay_hovered() -> bool:
 
 
 def clay_on_hover(on_hover_callback, user_data: c_void_p) -> None:
-    callback: _CFunctionType = onHoverFunction(on_hover_callback)
+    callback = ct.onHoverFunction(on_hover_callback)
     return _lib.Clay_OnHover(callback, user_data)
 
 
@@ -351,7 +313,7 @@ def clay_get_scroll_container_data(
 
 
 def clay_set_measure_text_function(measure_text_callback, user_data: c_void_p) -> None:
-    callback: _CFunctionType = measureTextFunction(measure_text_callback)
+    callback = ct.measureTextFunction(measure_text_callback)
     return _lib.Clay_SetMeasureTextFunction(callback, user_data)
 
 
@@ -359,7 +321,7 @@ def clay_set_query_scroll_offset_function(
     query_scroll_offset_callback,
     user_data: c_void_p,
 ) -> None:
-    callback: _CFunctionType = queryScrollOffsetFunction(query_scroll_offset_callback)
+    callback = ct.queryScrollOffsetFunction(query_scroll_offset_callback)
     return _lib.Clay_SetQueryScrollOffsetFunction(callback, user_data)
 
 
