@@ -15,7 +15,7 @@ from ctypes import (
 )
 from importlib.machinery import ModuleSpec
 
-from . import _types as ct
+from pyclay._clay import _types as ct
 
 
 class _ClayLib:

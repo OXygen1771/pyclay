@@ -5,7 +5,6 @@ from ctypes import (
     POINTER,
     Structure,
     Union,
-    _Pointer,
     c_bool,
     c_char_p,
     c_float,
@@ -29,9 +28,6 @@ class Clay_Context(Structure):
 
     # Since there is no public definition of Clay_Context in clay.h, don't
     # define anything here either.
-
-
-Clay_Context_p: type[_Pointer[Clay_Context]] = POINTER(Clay_Context)
 
 
 class Clay_String(Structure):
@@ -121,7 +117,7 @@ class Clay_ElementIdArray(Structure):
 
     _fields_ = (
         ("capacity", c_int32),
-        ("capacity", c_int32),
+        ("length", c_int32),
         ("internalArray", POINTER(Clay_ElementId)),
     )
 
@@ -384,6 +380,7 @@ class Clay_TransitionElementConfig(Structure):
         ("handler", _handler),
         ("duration", c_float),
         ("properties", c_uint32),  # Clay_TransitionProperty
+        ("interactionHandling", c_uint8),  # Clay_TransitionInteractionHandlingType
         ("enter", _enter),
         ("exit", _exit),
     )
@@ -608,5 +605,13 @@ queryScrollOffsetFunction = CFUNCTYPE(
     c_uint32,
     Clay_TextElementConfig,
 )
+
+# Via: Clay_ErrorHandler
+# void (*errorHandlerFunction)(Clay_ErrorData errorText)
+errorHandlerFunction = CFUNCTYPE(None, Clay_ErrorData)
+
+# Via: Clay_TransitionElementConfig
+# bool (*handler)(Clay_TransitionCallbackArguments arguments)
+transitionHandlerFunction = CFUNCTYPE(c_bool, Clay_TransitionCallbackArguments)
 
 # ruff: enable[N816]
