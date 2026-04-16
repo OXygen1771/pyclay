@@ -15,8 +15,7 @@ from ctypes import (
 )
 from importlib.machinery import ModuleSpec
 
-from pyclay import _clay_types as ct
-from pyclay._clay_types import Clay_ElementData, Clay_RenderCommand
+from . import _types as ct
 
 
 class _ClayLib:
@@ -131,7 +130,7 @@ class _ClayLib:
             ct.Clay_RenderCommandArray,
             c_int32,
         ]
-        lib.Clay_RenderCommandArray_Get.restype = POINTER(Clay_RenderCommand)
+        lib.Clay_RenderCommandArray_Get.restype = POINTER(ct.Clay_RenderCommand)
 
         lib.Clay_SetDebugModeEnabled.argtypes = [c_bool]
         lib.Clay_SetDebugModeEnabled.restype = None
@@ -285,7 +284,7 @@ def clay_get_element_id_with_index(
     return _lib.Clay_GetElementIdWithIndex(id_string, index)
 
 
-def clay_get_element_data(element_id: ct.Clay_ElementId) -> Clay_ElementData:
+def clay_get_element_data(element_id: ct.Clay_ElementId) -> ct.Clay_ElementData:
     return _lib.Clay_GetElementData(element_id)
 
 
