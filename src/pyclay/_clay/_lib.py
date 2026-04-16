@@ -390,6 +390,10 @@ def clay__configure_open_element_ptr(
     return _lib.Clay__ConfigureOpenElementPtr(config_ptr)
 
 
+def clay__close_element() -> None:
+    return _lib.Clay__CloseElement()
+
+
 def clay__hash_string(key: ct.Clay_String, seed: int) -> ct.Clay_ElementId:
     return _lib.Clay__HashString(key, seed)
 
