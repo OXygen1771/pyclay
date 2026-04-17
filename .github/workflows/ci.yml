@@ -23,7 +23,7 @@ jobs:
           submodules: recursive
 
       - name: astral-sh/setup-uv
-        uses: astral-sh/setup-uv@8.1.0
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           enable-cache: true
 
