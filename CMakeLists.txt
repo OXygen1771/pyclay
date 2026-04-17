@@ -8,6 +8,8 @@ find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
 python_add_library(_claylib MODULE src/_clay_impl.c WITH_SOABI)
 
+target_include_directories(_claylib PRIVATE ${CMAKE_SOURCE_DIR}/clay)
+set_target_properties(_claylib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 install(TARGETS _claylib DESTINATION pyclay)
 
-target_include_directories(_claylib PRIVATE ${CMAKE_SOURCE_DIR}/clay)
