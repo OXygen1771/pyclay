@@ -33,7 +33,11 @@ class Clay_LayoutAlignmentY(IntEnum):
 
 
 class Clay__SizingType(IntEnum):
-    """Controls how the element takes up space inside its parent container."""
+    """Controls how the element takes up space inside its parent container.
+
+    Note: the double underscore might be a typo, but it is present in the original
+    library, so I am including it here.
+    """
 
     CLAY__SIZING_TYPE_FIT = 0
     CLAY__SIZING_TYPE_GROW = 1

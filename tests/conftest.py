@@ -40,7 +40,10 @@ def initialized_clay(
     @ctypes.CFUNCTYPE(None, ct.Clay_ErrorData)
     def raise_handler(error_data: ct.Clay_ErrorData) -> None:
         e_type: Clay_ErrorType = error_data.errorType
-        e_text: str = error_data.errorText.chars.decode("utf-8")
+        if error_data.errorText.chars:
+            e_text: str = error_data.errorText.chars.decode("utf-8")
+        else:
+            e_text: str = "<no error text provided>"
         raise RuntimeError(f"{e_type}: {e_text}")
 
     error_handler = ct.Clay_ErrorHandler(
