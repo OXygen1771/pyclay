@@ -138,7 +138,7 @@ def test_simple_element(
     rect_config: ct.Clay_ElementDeclaration = ct.Clay_ElementDeclaration(
         layout=ct.Clay_LayoutConfig(
             padding=ct.Clay_Padding(16, 16, 12, 12),
-            layoutDirection=Clay_LayoutDirection.CLAY_TOP_TO_BOTTOM,
+            layoutDirection=Clay_LayoutDirection.default(),
         ),
         backgroundColor=ct.Clay_Color(255, 120, 120, 255),
         cornerRadius=ct.Clay_CornerRadius(
