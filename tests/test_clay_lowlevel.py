@@ -82,12 +82,15 @@ def test_error_handler(
 
     from pyclay._clay._enums import Clay_ErrorType
 
-    errors: list[tuple[type[Clay_ErrorType], str]] = []
+    errors: list[tuple[Clay_ErrorType, str]] = []
 
     @ctypes.CFUNCTYPE(None, ct.Clay_ErrorData)
     def basic_error_handler(error_data: ct.Clay_ErrorData) -> None:
         e_type: Clay_ErrorType = error_data.errorType
-        e_text: str = error_data.errorText.chars.decode("utf-8")
+        if error_data.errorText.chars:
+            e_text: str = error_data.errorText.chars.decode("utf-8")
+        else:
+            e_text: str = "<no error text provided>"
         print(f"{e_type}: {e_text}")
         errors.append((e_type, e_text))
 

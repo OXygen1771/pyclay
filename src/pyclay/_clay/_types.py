@@ -1,4 +1,4 @@
-"""Clay structures."""
+"""Clay structure wrappers using ctypes."""
 
 from ctypes import (
     CFUNCTYPE,
@@ -24,15 +24,12 @@ from ctypes import (
 
 
 class Clay_Context(Structure):
-    """The clay context."""
-
     # Since there is no public definition of Clay_Context in clay.h, don't
     # define anything here either.
+    pass
 
 
 class Clay_String(Structure):
-    """Base string structure. Either null-terminated C-string, or a slice."""
-
     _fields_ = (
         ("isStaticallyAllocated", c_bool),
         ("length", c_int32),
@@ -41,8 +38,6 @@ class Clay_String(Structure):
 
 
 class Clay_StringSlice(Structure):
-    """Represents non-owning string slices."""
-
     _fields_ = (
         ("length", c_int32),
         ("chars", c_char_p),
@@ -51,8 +46,6 @@ class Clay_StringSlice(Structure):
 
 
 class Clay_Arena(Structure):
-    """Memory arena structure to manage clay's internal allocations."""
-
     _fields_ = (
         # uintptr_t ~= uint64_t on most platforms, so...
         ("nextAllocation", c_uint64),
@@ -62,8 +55,6 @@ class Clay_Arena(Structure):
 
 
 class Clay_Dimensions(Structure):
-    """Dimenstions of an object."""
-
     _fields_ = (
         ("width", c_float),
         ("height", c_float),
@@ -71,8 +62,6 @@ class Clay_Dimensions(Structure):
 
 
 class Clay_Vector2(Structure):
-    """Two-dimensional vector."""
-
     _fields_ = (
         ("x", c_float),
         ("y", c_float),
@@ -80,8 +69,6 @@ class Clay_Vector2(Structure):
 
 
 class Clay_Color(Structure):
-    """Color represented as RGBA with values in the range (0, 255)."""
-
     _fields_ = (
         ("r", c_float),
         ("g", c_float),
@@ -91,8 +78,6 @@ class Clay_Color(Structure):
 
 
 class Clay_BoundingBox(Structure):
-    """Bounding box of an object."""
-
     _fields_ = (
         ("x", c_float),
         ("y", c_float),
@@ -102,8 +87,6 @@ class Clay_BoundingBox(Structure):
 
 
 class Clay_ElementId(Structure):
-    """Hashed string ID of specific UI elements."""
-
     _fields_ = (
         ("id", c_uint32),
         ("offset", c_uint32),
@@ -113,8 +96,6 @@ class Clay_ElementId(Structure):
 
 
 class Clay_ElementIdArray(Structure):
-    """Sized array of Clay_ElementId."""
-
     _fields_ = (
         ("capacity", c_int32),
         ("length", c_int32),
@@ -123,8 +104,6 @@ class Clay_ElementIdArray(Structure):
 
 
 class Clay_CornerRadius(Structure):
-    """Controls corner rounding of elements."""
-
     _fields_ = (
         ("topLeft", c_float),
         ("topRight", c_float),
@@ -138,8 +117,6 @@ class Clay_CornerRadius(Structure):
 
 
 class Clay_ChildAlignment(Structure):
-    """Controls how child elements are aligned on each axis."""
-
     _fields_ = (
         ("x", c_uint8),  # Clay_LayoutAlignmentX
         ("y", c_uint8),  # Clay_LayoutAlignmentY
@@ -147,8 +124,6 @@ class Clay_ChildAlignment(Structure):
 
 
 class Clay_SizingMinMax(Structure):
-    """Controls minimum and maximum size of an element in pixels."""
-
     _fields_ = (
         ("min", c_float),
         ("max", c_float),
@@ -156,8 +131,6 @@ class Clay_SizingMinMax(Structure):
 
 
 class Clay_SizingAxis(Structure):
-    """Controls the sizing of an element along one axis inside its parent container."""
-
     class _U(Union):
         _fields_ = (
             ("minMax", Clay_SizingMinMax),
@@ -171,8 +144,6 @@ class Clay_SizingAxis(Structure):
 
 
 class Clay_Sizing(Structure):
-    """Controls the sizing of an element along one axis inside its parent container."""
-
     _fields_ = (
         ("width", Clay_SizingAxis),
         ("height", Clay_SizingAxis),
@@ -180,8 +151,6 @@ class Clay_Sizing(Structure):
 
 
 class Clay_Padding(Structure):
-    """Controls the padding (gap between the bounding box and children) in pixels."""
-
     _fields_ = (
         ("left", c_uint16),
         ("right", c_uint16),
@@ -191,8 +160,6 @@ class Clay_Padding(Structure):
 
 
 class Clay_LayoutConfig(Structure):
-    """Controls the layout config."""
-
     _fields_ = (
         ("sizing", Clay_Sizing),
         ("padding", Clay_Padding),
@@ -203,8 +170,6 @@ class Clay_LayoutConfig(Structure):
 
 
 class Clay_TextElementConfig(Structure):
-    """Controls text elements."""
-
     _fields_ = (
         ("userData", c_void_p),
         ("textColor", Clay_Color),
@@ -221,8 +186,6 @@ class Clay_TextElementConfig(Structure):
 
 
 class Clay_AspectRatioElementConfig(Structure):
-    """Controls the aspect ratio."""
-
     _fields_ = (("aspectRatio", c_float),)
 
 
@@ -230,8 +193,6 @@ class Clay_AspectRatioElementConfig(Structure):
 
 
 class Clay_ImageElementConfig(Structure):
-    """Controls image elements."""
-
     _fields_ = (("imageData", c_void_p),)
 
 
@@ -239,8 +200,6 @@ class Clay_ImageElementConfig(Structure):
 
 
 class Clay_FloatingAttachPoints(Structure):
-    """Controls where a floating element is offset relative to its parent."""
-
     _fields_ = (
         ("element", c_uint8),  # Clay_FloatingAttachPointType
         ("parent", c_uint8),  # Clay_FloatingAttachPointType
@@ -248,8 +207,6 @@ class Clay_FloatingAttachPoints(Structure):
 
 
 class Clay_FloatingElementConfig(Structure):
-    """Controls floating elements."""
-
     _fields_ = (
         ("offset", Clay_Vector2),
         ("expand", Clay_Dimensions),
@@ -266,8 +223,6 @@ class Clay_FloatingElementConfig(Structure):
 
 
 class Clay_CustomElementConfig(Structure):
-    """Controls custom elements."""
-
     _fields_ = (("customData", c_void_p),)
 
 
@@ -275,8 +230,6 @@ class Clay_CustomElementConfig(Structure):
 
 
 class Clay_ClipElementConfig(Structure):
-    """Controls the scrolling axis of an element."""
-
     _fields_ = (
         ("horizontal", c_bool),
         ("vertical", c_bool),
@@ -288,8 +241,6 @@ class Clay_ClipElementConfig(Structure):
 
 
 class Clay_BorderWidth(Structure):
-    """Controls the widths of individual element borders."""
-
     _fields_ = (
         ("left", c_uint16),
         ("right", c_uint16),
@@ -300,8 +251,6 @@ class Clay_BorderWidth(Structure):
 
 
 class Clay_BorderElementConfig(Structure):
-    """Controls element borders."""
-
     _fields_ = (
         ("color", Clay_Color),
         ("width", Clay_BorderWidth),
@@ -312,8 +261,6 @@ class Clay_BorderElementConfig(Structure):
 
 
 class Clay_TransitionData(Structure):
-    """Controls transitions data."""
-
     _fields_ = (
         ("boundingBox", Clay_BoundingBox),
         ("backgroundColor", Clay_Color),
@@ -324,8 +271,6 @@ class Clay_TransitionData(Structure):
 
 
 class Clay_TransitionCallbackArguments(Structure):
-    """Arguments to pass to a transition function."""
-
     _fields_ = (
         ("transitionState", c_uint8),  # Clay_TransitionState
         ("initial", Clay_TransitionData),
@@ -338,8 +283,6 @@ class Clay_TransitionCallbackArguments(Structure):
 
 
 class Clay_TransitionElementConfig(Structure):
-    """Controls transitions."""
-
     # bool (*handler)(Clay_TransitionCallbackArguments arguments)
     _handler = CFUNCTYPE(c_bool, Clay_TransitionCallbackArguments)
 
@@ -390,8 +333,6 @@ class Clay_TransitionElementConfig(Structure):
 
 
 class Clay_TextRenderData(Structure):
-    """Render command data when type is CLAY_RENDER_COMMAND_TYPE_TEXT."""
-
     _fields_ = (
         ("stringContents", Clay_StringSlice),
         ("textColor", Clay_Color),
@@ -403,8 +344,6 @@ class Clay_TextRenderData(Structure):
 
 
 class Clay_RectangleRenderData(Structure):
-    """Render command data when is CLAY_RENDER_COMMAND_TYPE_RECTANGLE."""
-
     _fields_ = (
         ("backgroundColor", Clay_Color),
         ("cornerRadius", Clay_CornerRadius),
@@ -412,8 +351,6 @@ class Clay_RectangleRenderData(Structure):
 
 
 class Clay_ImageRenderData(Structure):
-    """Render command data when type is CLAY_RENDER_COMMAND_TYPE_IMAGE."""
-
     _fields_ = (
         ("backgroundColor", Clay_Color),
         ("cornerRadius", Clay_CornerRadius),
@@ -422,8 +359,6 @@ class Clay_ImageRenderData(Structure):
 
 
 class Clay_CustomRenderData(Structure):
-    """Render command data when type is CLAY_RENDER_COMMAND_TYPE_CUSTOM."""
-
     _fields_ = (
         ("backgroundColor", Clay_Color),
         ("cornerRadius", Clay_CornerRadius),
@@ -432,8 +367,6 @@ class Clay_CustomRenderData(Structure):
 
 
 class Clay_ClipRenderData(Structure):
-    """Render command data when type is CLAY_RENDER_COMMAND_TYPE_SCISSOR_START/END."""
-
     _fields_ = (
         ("horizontal", c_bool),
         ("vertical", c_bool),
@@ -441,14 +374,10 @@ class Clay_ClipRenderData(Structure):
 
 
 class Clay_OverlayColorRenderData(Structure):
-    """Render command data when type is CLAY_RENDER_COMMAND_TYPE_OVERLAY_START/END."""
-
     _fields_ = (("color", Clay_Color),)
 
 
 class Clay_BorderRenderData(Structure):
-    """Render command data when type is CLAY_RENDER_COMMAND_BORDER."""
-
     _field_ = (
         ("color", Clay_Color),
         ("cornerRadius", Clay_CornerRadius),
@@ -457,8 +386,6 @@ class Clay_BorderRenderData(Structure):
 
 
 class Clay_RenderData(Union):
-    """Union of structs containing data specific to a render command."""
-
     _fields_ = (
         ("rectangle", Clay_RectangleRenderData),
         ("text", Clay_TextRenderData),
@@ -471,8 +398,6 @@ class Clay_RenderData(Union):
 
 
 class Clay_RenderCommand(Structure):
-    """Represents a render command sent to a renderer."""
-
     _fields_ = (
         ("boundingBox", Clay_BoundingBox),
         ("renderData", Clay_RenderData),
@@ -484,8 +409,6 @@ class Clay_RenderCommand(Structure):
 
 
 class Clay_RenderCommandArray(Structure):
-    """Sized array of Clay_RenderCommand."""
-
     _fields_ = (
         ("capacity", c_int32),
         ("length", c_int32),
@@ -497,8 +420,6 @@ class Clay_RenderCommandArray(Structure):
 
 
 class Clay_ScrollContainerData(Structure):
-    """Represents the current internal state of a scrolling element."""
-
     _fields_ = (
         ("scrollPosition", POINTER(Clay_Vector2)),
         ("scrollContainerDimensions", Clay_Dimensions),
@@ -509,8 +430,6 @@ class Clay_ScrollContainerData(Structure):
 
 
 class Clay_ElementData(Structure):
-    """Data for a specific UI element."""
-
     _fields_ = (
         ("boundingBox", Clay_BoundingBox),
         ("found", c_bool),
@@ -518,8 +437,6 @@ class Clay_ElementData(Structure):
 
 
 class Clay_PointerData(Structure):
-    """Information on the current state of pointer interaction."""
-
     _fields_ = (
         ("position", Clay_Vector2),
         ("state", c_uint8),  # Clay_PointerDataInteractionState
@@ -527,8 +444,6 @@ class Clay_PointerData(Structure):
 
 
 class Clay_ElementDeclaration(Structure):
-    """Declaration of an element."""
-
     _fields_ = (
         ("layout", Clay_LayoutConfig),
         ("backgroundColor", Clay_Color),
@@ -548,8 +463,6 @@ class Clay_ElementDeclaration(Structure):
 
 
 class Clay_ErrorData(Structure):
-    """Data to identify the error that clay has encountered."""
-
     _fields_ = (
         ("errorType", c_uint8),  # Clay_ErrorType
         ("errorText", Clay_String),
@@ -558,8 +471,6 @@ class Clay_ErrorData(Structure):
 
 
 class Clay_ErrorHandler(Structure):
-    """Wrapper struct around Clay's error handler function."""
-
     _errorHandlerFunction = CFUNCTYPE(None, Clay_ErrorData)  # noqa: N815
 
     _fields_ = (
