@@ -10,26 +10,26 @@ from ctypes import (
     c_void_p,
 )
 
-from pyclay._clay._enums import (
-    Clay__SizingType,
-    Clay_ErrorType,
-    Clay_ExitTransitionSiblingOrdering,
-    Clay_FloatingAttachPointType,
-    Clay_FloatingAttachToElement,
-    Clay_FloatingClipToElement,
-    Clay_LayoutAlignmentX,
-    Clay_LayoutAlignmentY,
-    Clay_LayoutDirection,
-    Clay_PointerCaptureMode,
-    Clay_PointerDataInteractionState,
-    Clay_RenderCommandType,
-    Clay_TextAlignment,
-    Clay_TextElementConfigWrapMode,
-    Clay_TransitionEnterTriggerType,
-    Clay_TransitionExitTriggerType,
-    Clay_TransitionInteractionHandlingType,
-    Clay_TransitionProperty,
-    Clay_TransitionState,
+from pyclay.enums import (
+    ErrorType,
+    ExitTransitionSiblingOrdering,
+    FloatingAttachPointType,
+    FloatingAttachToElement,
+    FloatingClipToElement,
+    LayoutAlignmentX,
+    LayoutAlignmentY,
+    LayoutDirection,
+    PointerCaptureMode,
+    PointerDataInteractionState,
+    RenderCommandType,
+    SizingType,
+    TextAlignment,
+    TextElementConfigWrapMode,
+    TransitionEnterTriggerType,
+    TransitionExitTriggerType,
+    TransitionInteractionHandlingType,
+    TransitionProperty,
+    TransitionState,
 )
 
 # ruff: disable[N801,N803,N815]
@@ -201,13 +201,13 @@ class Clay_CornerRadius(Structure):
 class Clay_ChildAlignment(Structure):
     """Controls how child elements are aligned on each axis."""
 
-    x: Clay_LayoutAlignmentX
-    y: Clay_LayoutAlignmentY
+    x: LayoutAlignmentX
+    y: LayoutAlignmentY
 
     def __init__(
         self,
-        x: Clay_LayoutAlignmentX | None = ...,
-        y: Clay_LayoutAlignmentY | None = ...,
+        x: LayoutAlignmentX | None = ...,
+        y: LayoutAlignmentY | None = ...,
     ) -> None: ...
 
 class Clay_SizingMinMax(Structure):
@@ -237,12 +237,12 @@ class Clay_SizingAxis(Structure):
         ) -> None: ...
 
     size: _U
-    type: Clay__SizingType
+    type: SizingType
 
     def __init__(
         self,
         size: _U | None = ...,
-        type: Clay__SizingType | None = ...,  # noqa: A002
+        type: SizingType | None = ...,  # noqa: A002
     ) -> None: ...
 
 class Clay_Sizing(Structure):
@@ -280,7 +280,7 @@ class Clay_LayoutConfig(Structure):
     padding: Clay_Padding  # Padding between this element's border and its children.
     childGap: int  # Gap between children in pixels along the child layout axis.
     childAlignment: Clay_ChildAlignment
-    layoutDirection: Clay_LayoutDirection
+    layoutDirection: LayoutDirection
 
     def __init__(
         self,
@@ -288,7 +288,7 @@ class Clay_LayoutConfig(Structure):
         padding: Clay_Padding | None = ...,
         childGap: int | None = ...,
         childAlignment: Clay_ChildAlignment | None = ...,
-        layoutDirection: Clay_LayoutDirection | None = ...,
+        layoutDirection: LayoutDirection | None = ...,
     ) -> None: ...
 
 class Clay_TextElementConfig(Structure):
@@ -304,8 +304,8 @@ class Clay_TextElementConfig(Structure):
     fontSize: int
     letterSpacing: int
     lineHeight: int
-    wrapMode: Clay_TextElementConfigWrapMode
-    textAlignment: Clay_TextAlignment
+    wrapMode: TextElementConfigWrapMode
+    textAlignment: TextAlignment
 
     def __init__(
         self,
@@ -315,8 +315,8 @@ class Clay_TextElementConfig(Structure):
         fontSize: int | None = ...,
         letterSpacing: int | None = ...,
         lineHeight: int | None = ...,
-        wrapMode: Clay_TextElementConfigWrapMode | None = ...,
-        textAlignment: Clay_TextAlignment | None = ...,
+        wrapMode: TextElementConfigWrapMode | None = ...,
+        textAlignment: TextAlignment | None = ...,
     ) -> None: ...
 
 # --- Aspect Ratio ---
@@ -348,13 +348,13 @@ class Clay_ImageElementConfig(Structure):
 class Clay_FloatingAttachPoints(Structure):
     """Controls where a floating element is offset relative to its parent."""
 
-    element: Clay_FloatingAttachPointType  # Origin point that gets attached to parent.
-    parent: Clay_FloatingAttachPointType  # Point on parent the element is attached to.
+    element: FloatingAttachPointType  # Origin point that gets attached to parent.
+    parent: FloatingAttachPointType  # Point on parent the element is attached to.
 
     def __init__(
         self,
-        element: Clay_FloatingAttachPointType | None = ...,
-        parent: Clay_FloatingAttachPointType | None = ...,
+        element: FloatingAttachPointType | None = ...,
+        parent: FloatingAttachPointType | None = ...,
     ) -> None: ...
 
 class Clay_FloatingElementConfig(Structure):
@@ -365,9 +365,9 @@ class Clay_FloatingElementConfig(Structure):
     parentId: int  # Attach element to parent if attaching via ID.
     zIndex: int  # Sorted in ascending order. Passed to the renderer.
     attachPoints: Clay_FloatingAttachPoints
-    pointerCaptureMode: Clay_PointerCaptureMode
-    attachTo: Clay_FloatingAttachToElement  # How the floating element is attached.
-    clipTo: Clay_FloatingClipToElement
+    pointerCaptureMode: PointerCaptureMode
+    attachTo: FloatingAttachToElement  # How the floating element is attached.
+    clipTo: FloatingClipToElement
 
     def __init__(
         self,
@@ -376,9 +376,9 @@ class Clay_FloatingElementConfig(Structure):
         parentId: int | None = ...,
         zIndex: int | None = ...,
         attachPoints: Clay_FloatingAttachPoints | None = ...,
-        pointerCaptureMode: Clay_PointerCaptureMode | None = ...,
-        attachTo: Clay_FloatingAttachToElement | None = ...,
-        clipTo: Clay_FloatingClipToElement | None = ...,
+        pointerCaptureMode: PointerCaptureMode | None = ...,
+        attachTo: FloatingAttachToElement | None = ...,
+        clipTo: FloatingClipToElement | None = ...,
     ) -> None: ...
 
 # --- Custom ---
@@ -475,23 +475,23 @@ class Clay_TransitionData(Structure):
 class Clay_TransitionCallbackArguments(Structure):
     """Arguments to pass to a transition function (?)."""
 
-    transitionState: Clay_TransitionState  # Current transition state.
+    transitionState: TransitionState  # Current transition state.
     initial: Clay_TransitionData  # Initial settings before the transition.
     current: type[POINTER(Clay_TransitionData)] | None  # Current (changing) data.
     target: Clay_TransitionData  # Target settings after the transition.
     elapsedTime: float
     duration: float
-    properties: Clay_TransitionProperty
+    properties: TransitionProperty
 
     def __init__(
         self,
-        transitionState: Clay_TransitionState | None = ...,
+        transitionState: TransitionState | None = ...,
         initial: Clay_TransitionData | None = ...,
         current: type[POINTER(Clay_TransitionData)] | None = ...,
         target: Clay_TransitionData | None = ...,
         elapsedTime: float | None = ...,
         duration: float | None = ...,
-        properties: Clay_TransitionProperty | None = ...,
+        properties: TransitionProperty | None = ...,
     ) -> None: ...
 
 class Clay_TransitionElementConfig(Structure):
@@ -504,7 +504,7 @@ class Clay_TransitionElementConfig(Structure):
         setInitialState: type[
             CFUNCTYPE(Clay_TransitionData, Clay_TransitionData, c_uint32)
         ]
-        trigger: Clay_TransitionEnterTriggerType
+        trigger: TransitionEnterTriggerType
 
         def __init__(
             self,
@@ -512,7 +512,7 @@ class Clay_TransitionElementConfig(Structure):
                 CFUNCTYPE(Clay_TransitionData, Clay_TransitionData, c_uint32)
             ]
             | None = ...,
-            trigger: Clay_TransitionEnterTriggerType | None = ...,
+            trigger: TransitionEnterTriggerType | None = ...,
         ) -> None: ...
 
     class _exit(Structure):
@@ -527,8 +527,8 @@ class Clay_TransitionElementConfig(Structure):
                 c_uint32,
             )
         ]
-        trigger: Clay_TransitionExitTriggerType
-        siblingOrdering: Clay_ExitTransitionSiblingOrdering
+        trigger: TransitionExitTriggerType
+        siblingOrdering: ExitTransitionSiblingOrdering
 
         def __init__(
             self,
@@ -540,14 +540,14 @@ class Clay_TransitionElementConfig(Structure):
                 )
             ]
             | None = ...,
-            trigger: Clay_TransitionExitTriggerType | None = ...,
-            siblingOrdering: Clay_ExitTransitionSiblingOrdering | None = ...,
+            trigger: TransitionExitTriggerType | None = ...,
+            siblingOrdering: ExitTransitionSiblingOrdering | None = ...,
         ) -> None: ...
 
     handler: type[CFUNCTYPE(c_bool, Clay_TransitionCallbackArguments)]
     duration: float
-    properties: Clay_TransitionProperty
-    interactionHandling: Clay_TransitionInteractionHandlingType
+    properties: TransitionProperty
+    interactionHandling: TransitionInteractionHandlingType
     enter: _enter
     exit: _exit
 
@@ -555,8 +555,8 @@ class Clay_TransitionElementConfig(Structure):
         self,
         handler: type[CFUNCTYPE(c_bool, Clay_TransitionCallbackArguments)] | None = ...,
         duration: float | None = ...,
-        properties: Clay_TransitionProperty | None = ...,
-        interactionHandling: Clay_TransitionInteractionHandlingType | None = ...,
+        properties: TransitionProperty | None = ...,
+        interactionHandling: TransitionInteractionHandlingType | None = ...,
         enter: _enter | None = ...,
         exit: _exit | None = ...,  # noqa: A002
     ) -> None: ...
@@ -692,7 +692,7 @@ class Clay_RenderCommand(Structure):
     userData: c_void_p | None  # Transparently passed to the renderer.
     id: int  # ID of the element, transparently passed to the renderer.
     zIndex: int  # Final z order to draw the command correctly.
-    commandType: Clay_RenderCommandType  # Specifies how to handle the command.
+    commandType: RenderCommandType  # Specifies how to handle the command.
 
     def __init__(
         self,
@@ -701,7 +701,7 @@ class Clay_RenderCommand(Structure):
         userData: c_void_p | None = ...,
         id: int | None = ...,  # noqa: A002
         zIndex: int | None = ...,
-        commandType: Clay_RenderCommandType | None = ...,
+        commandType: RenderCommandType | None = ...,
     ) -> None: ...
 
 class Clay_RenderCommandArray(Structure):
@@ -754,12 +754,12 @@ class Clay_PointerData(Structure):
     """Information on the current state of pointer interaction."""
 
     position: Clay_Vector2  # Position of the pointer relative to layout root.
-    state: Clay_PointerDataInteractionState  # State in the current frame.
+    state: PointerDataInteractionState  # State in the current frame.
 
     def __init__(
         self,
         position: Clay_Vector2 | None = ...,
-        state: Clay_PointerDataInteractionState | None = ...,
+        state: PointerDataInteractionState | None = ...,
     ) -> None: ...
 
 class Clay_ElementDeclaration(Structure):
@@ -797,13 +797,13 @@ class Clay_ElementDeclaration(Structure):
 class Clay_ErrorData(Structure):
     """Data to identify the error that clay has encountered."""
 
-    errorType: Clay_ErrorType  # Error encountered while computing layout.
+    errorType: ErrorType  # Error encountered while computing layout.
     errorText: Clay_String  # Human-readable error text.
     userData: c_void_p | None  # Transparently passed from the first error handler.
 
     def __init__(
         self,
-        errorType: Clay_ErrorType | None = ...,
+        errorType: ErrorType | None = ...,
         errorText: Clay_String | None = ...,
         userData: c_void_p | None = ...,
     ) -> None: ...

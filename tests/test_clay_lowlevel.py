@@ -80,13 +80,13 @@ def test_error_handler(
     arena_struct, _mem = arena_memory
     _clay_lib = clay_lib
 
-    from pyclay._clay._enums import Clay_ErrorType
+    from pyclay.enums import ErrorType
 
-    errors: list[tuple[Clay_ErrorType, str]] = []
+    errors: list[tuple[ErrorType, str]] = []
 
     @ctypes.CFUNCTYPE(None, ct.Clay_ErrorData)
     def basic_error_handler(error_data: ct.Clay_ErrorData) -> None:
-        e_type: Clay_ErrorType = error_data.errorType
+        e_type: ErrorType = error_data.errorType
         if error_data.errorText.chars:
             e_text: str = error_data.errorText.chars.decode("utf-8")
         else:
@@ -112,7 +112,7 @@ def test_error_handler(
     clay_end_layout(0.1)
 
     assert len(errors) > 0
-    assert errors[0][0] == Clay_ErrorType.CLAY_ERROR_TYPE_INTERNAL_ERROR
+    assert errors[0][0] == ErrorType.INTERNAL_ERROR
 
 
 def test_simple_element(
@@ -123,7 +123,6 @@ def test_simple_element(
     _arena_struct, _mem = initialized_clay
     _clay_lib = clay_lib
 
-    from pyclay._clay._enums import Clay_LayoutDirection
     from pyclay._clay._lib import (
         clay__close_element,
         clay__configure_open_element,
@@ -131,6 +130,7 @@ def test_simple_element(
         clay_begin_layout,
         clay_end_layout,
     )
+    from pyclay.enums import LayoutDirection
 
     clay_begin_layout()
 
@@ -138,7 +138,7 @@ def test_simple_element(
     rect_config: ct.Clay_ElementDeclaration = ct.Clay_ElementDeclaration(
         layout=ct.Clay_LayoutConfig(
             padding=ct.Clay_Padding(16, 16, 12, 12),
-            layoutDirection=Clay_LayoutDirection.default(),
+            layoutDirection=LayoutDirection.default(),
         ),
         backgroundColor=ct.Clay_Color(255, 120, 120, 255),
         cornerRadius=ct.Clay_CornerRadius(

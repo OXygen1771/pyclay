@@ -35,11 +35,11 @@ def initialized_clay(
     """
     arena_struct, mem = arena_memory
 
-    from pyclay._clay._enums import Clay_ErrorType
+    from pyclay.enums import ErrorType
 
     @ctypes.CFUNCTYPE(None, ct.Clay_ErrorData)
     def raise_handler(error_data: ct.Clay_ErrorData) -> None:
-        e_type: Clay_ErrorType = error_data.errorType
+        e_type: ErrorType = error_data.errorType
         if error_data.errorText.chars:
             e_text: str = error_data.errorText.chars.decode("utf-8")
         else:
