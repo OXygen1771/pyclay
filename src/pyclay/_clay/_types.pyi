@@ -201,13 +201,13 @@ class Clay_CornerRadius(Structure):
 class Clay_ChildAlignment(Structure):
     """Controls how child elements are aligned on each axis."""
 
-    x: LayoutAlignmentX
-    y: LayoutAlignmentY
+    x: LayoutAlignmentX | int
+    y: LayoutAlignmentY | int
 
     def __init__(
         self,
-        x: LayoutAlignmentX | None = ...,
-        y: LayoutAlignmentY | None = ...,
+        x: LayoutAlignmentX | int | None = ...,
+        y: LayoutAlignmentY | int | None = ...,
     ) -> None: ...
 
 class Clay_SizingMinMax(Structure):
@@ -237,12 +237,12 @@ class Clay_SizingAxis(Structure):
         ) -> None: ...
 
     size: _U
-    type: SizingType
+    type: SizingType | int
 
     def __init__(
         self,
         size: _U | None = ...,
-        type: SizingType | None = ...,  # noqa: A002
+        type: SizingType | int | None = ...,  # noqa: A002
     ) -> None: ...
 
 class Clay_Sizing(Structure):
@@ -280,7 +280,7 @@ class Clay_LayoutConfig(Structure):
     padding: Clay_Padding  # Padding between this element's border and its children.
     childGap: int  # Gap between children in pixels along the child layout axis.
     childAlignment: Clay_ChildAlignment
-    layoutDirection: LayoutDirection
+    layoutDirection: LayoutDirection | int
 
     def __init__(
         self,
@@ -288,7 +288,7 @@ class Clay_LayoutConfig(Structure):
         padding: Clay_Padding | None = ...,
         childGap: int | None = ...,
         childAlignment: Clay_ChildAlignment | None = ...,
-        layoutDirection: LayoutDirection | None = ...,
+        layoutDirection: LayoutDirection | int | None = ...,
     ) -> None: ...
 
 class Clay_TextElementConfig(Structure):
@@ -304,8 +304,8 @@ class Clay_TextElementConfig(Structure):
     fontSize: int
     letterSpacing: int
     lineHeight: int
-    wrapMode: TextElementConfigWrapMode
-    textAlignment: TextAlignment
+    wrapMode: TextElementConfigWrapMode | int
+    textAlignment: TextAlignment | int
 
     def __init__(
         self,
@@ -315,8 +315,8 @@ class Clay_TextElementConfig(Structure):
         fontSize: int | None = ...,
         letterSpacing: int | None = ...,
         lineHeight: int | None = ...,
-        wrapMode: TextElementConfigWrapMode | None = ...,
-        textAlignment: TextAlignment | None = ...,
+        wrapMode: TextElementConfigWrapMode | int | None = ...,
+        textAlignment: TextAlignment | int | None = ...,
     ) -> None: ...
 
 # --- Aspect Ratio ---
@@ -348,13 +348,13 @@ class Clay_ImageElementConfig(Structure):
 class Clay_FloatingAttachPoints(Structure):
     """Controls where a floating element is offset relative to its parent."""
 
-    element: FloatingAttachPointType  # Origin point that gets attached to parent.
-    parent: FloatingAttachPointType  # Point on parent the element is attached to.
+    element: FloatingAttachPointType | int  # Origin point that gets attached to parent.
+    parent: FloatingAttachPointType | int  # Point on parent the element is attached to.
 
     def __init__(
         self,
-        element: FloatingAttachPointType | None = ...,
-        parent: FloatingAttachPointType | None = ...,
+        element: FloatingAttachPointType | int | None = ...,
+        parent: FloatingAttachPointType | int | None = ...,
     ) -> None: ...
 
 class Clay_FloatingElementConfig(Structure):
@@ -365,9 +365,9 @@ class Clay_FloatingElementConfig(Structure):
     parentId: int  # Attach element to parent if attaching via ID.
     zIndex: int  # Sorted in ascending order. Passed to the renderer.
     attachPoints: Clay_FloatingAttachPoints
-    pointerCaptureMode: PointerCaptureMode
-    attachTo: FloatingAttachToElement  # How the floating element is attached.
-    clipTo: FloatingClipToElement
+    pointerCaptureMode: PointerCaptureMode | int
+    attachTo: FloatingAttachToElement | int  # How the floating element is attached.
+    clipTo: FloatingClipToElement | int
 
     def __init__(
         self,
@@ -376,9 +376,9 @@ class Clay_FloatingElementConfig(Structure):
         parentId: int | None = ...,
         zIndex: int | None = ...,
         attachPoints: Clay_FloatingAttachPoints | None = ...,
-        pointerCaptureMode: PointerCaptureMode | None = ...,
-        attachTo: FloatingAttachToElement | None = ...,
-        clipTo: FloatingClipToElement | None = ...,
+        pointerCaptureMode: PointerCaptureMode | int | None = ...,
+        attachTo: FloatingAttachToElement | int | None = ...,
+        clipTo: FloatingClipToElement | int | None = ...,
     ) -> None: ...
 
 # --- Custom ---
