@@ -212,7 +212,13 @@ class TransitionEnterTriggerType(IntEnum):
     SKIP_ON_FIRST_PARENT_FRAME = 0
     TRIGGER_ON_FIRST_PARENT_FRAME = 1
 
-    # Note that  doesn't specify the default value here.
+    @classmethod
+    def default(cls):
+        """Get the default value, as defined in clay.h.
+
+        Note that  doesn't specify the default value here.
+        """
+        return cls.SKIP_ON_FIRST_PARENT_FRAME
 
 
 class TransitionExitTriggerType(IntEnum):
@@ -221,7 +227,13 @@ class TransitionExitTriggerType(IntEnum):
     SKIP_WHEN_PARENT_EXITS = 0
     TRIGGER_WHEN_PARENT_EXITS = 1
 
-    # Note that  doesn't specify the default value here.
+    @classmethod
+    def default(cls):
+        """Get the default value, as defined in clay.h.
+
+        Note that  doesn't specify the default value here.
+        """
+        return cls.SKIP_WHEN_PARENT_EXITS
 
 
 class TransitionInteractionHandlingType(IntEnum):
@@ -230,7 +242,13 @@ class TransitionInteractionHandlingType(IntEnum):
     DISABLE_INTERACTIONS_WHILE_TRANSITIONING_POSITION = 0
     ALLOW_INTERACTIONS_WHILE_TRANSITIONING_POSITION = 1
 
-    # Note that  doesn't specify the default value here.
+    @classmethod
+    def default(cls):
+        """Get the default value, as defined in clay.h.
+
+        Note that  doesn't specify the default value here.
+        """
+        return cls.DISABLE_INTERACTIONS_WHILE_TRANSITIONING_POSITION
 
 
 class ExitTransitionSiblingOrdering(IntEnum):
@@ -240,7 +258,13 @@ class ExitTransitionSiblingOrdering(IntEnum):
     NATURAL_ORDER = 1
     ABOVE_SIBLINGS = 2
 
-    # Note that  doesn't specify the default value here.
+    @classmethod
+    def default(cls):
+        """Get the default value, as defined in clay.h.
+
+        Note that  doesn't specify the default value here.
+        """
+        return cls.NATURAL_ORDER
 
 
 class RenderCommandType(IntEnum):
