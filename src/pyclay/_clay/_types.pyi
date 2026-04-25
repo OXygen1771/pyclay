@@ -617,7 +617,7 @@ class Clay_CustomRenderData(Structure):
 
     backgroundColor: Clay_Color
     cornerRadius: Clay_CornerRadius
-    imageData: c_void_p | None
+    customData: c_void_p | None
 
     def __init__(
         self,
