@@ -430,7 +430,7 @@ class TextConfig:
                 textAlignment=self.text_alignment,
             )
             if self.user_data is not None:
-                # TODO(oxygen): add user data storage
+                # TODO(oxygen): add user data storage  # noqa: FIX002, TD003
                 c_config.userData = ctypes.c_void_p(0)
             else:
                 c_config.userData = ctypes.c_void_p(0)
@@ -465,7 +465,7 @@ class ImageConfig(NamedTuple):
         c_config: ct.Clay_ImageElementConfig = ct.Clay_ImageElementConfig()
 
         if self.image_data is not None:
-            # TODO(oxygen): add user data storage
+            # TODO(oxygen): add user data storage  # noqa: FIX002, TD003
             c_config.imageData = ctypes.c_void_p(0)
         else:
             c_config.imageData = ctypes.c_void_p(0)
@@ -475,7 +475,7 @@ class ImageConfig(NamedTuple):
     @classmethod
     def from_ctypes(cls, c: ct.Clay_ImageElementConfig) -> ImageConfig:
         """Convert the underlying ctypes structure to the config."""
-        # TODO(oxygen): add user data retrieval
+        # TODO(oxygen): add user data retrieval  # noqa: FIX002, TD003
         return cls(image_data=c.imageData)
 
 
@@ -571,7 +571,7 @@ class CustomConfig(NamedTuple):
         c_config: ct.Clay_CustomElementConfig = ct.Clay_CustomElementConfig()
 
         if self.custom_data is not None:
-            # TODO(oxygen): add user data storage
+            # TODO(oxygen): add user data storage  # noqa: FIX002, TD003
             c_config.customData = ctypes.c_void_p(0)
         else:
             c_config.customData = ctypes.c_void_p(0)
@@ -581,7 +581,7 @@ class CustomConfig(NamedTuple):
     @classmethod
     def from_ctypes(cls, c: ct.Clay_CustomElementConfig) -> CustomConfig:
         """Convert the underlying ctypes structure to the config."""
-        # TODO(oxygen): add user data retrieval
+        # TODO(oxygen): add user data retrieval  # noqa: FIX002, TD003
         return cls(custom_data=c.customData)
 
 
@@ -998,7 +998,7 @@ class ElementDeclaration:
             )
 
             if self.user_data is not None:
-                # TODO(oxygen): add user data storage
+                # TODO(oxygen): add user data storage  # noqa: FIX002, TD003
                 c_elem.userData = ctypes.c_void_p(0)
             else:
                 c_elem.userData = ctypes.c_void_p(0)
