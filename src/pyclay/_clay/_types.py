@@ -450,6 +450,7 @@ class Clay_ElementDeclaration(Structure):
         ("overlayColor", Clay_Color),
         ("cornerRadius", Clay_CornerRadius),
         ("aspectRatio", Clay_AspectRatioElementConfig),
+        ("image", Clay_ImageElementConfig),
         ("floating", Clay_FloatingElementConfig),
         ("custom", Clay_CustomElementConfig),
         ("clip", Clay_ClipElementConfig),

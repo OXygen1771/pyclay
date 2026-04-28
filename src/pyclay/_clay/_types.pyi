@@ -770,6 +770,7 @@ class Clay_ElementDeclaration(Structure):
     overlayColor: Clay_Color  # Color to overlay on the elemt and its children.
     cornerRadius: Clay_CornerRadius
     aspectRatio: Clay_AspectRatioElementConfig  # Desired aspect ratio of the element.
+    image: Clay_ImageElementConfig  # Controls images
     floating: Clay_FloatingElementConfig  # Controls how the elemnt floats above others.
     custom: Clay_CustomElementConfig  # Configuration for CUSTOM render commands.
     clip: Clay_ClipElementConfig  # Controls content clipping of the element.
@@ -784,6 +785,7 @@ class Clay_ElementDeclaration(Structure):
         overlayColor: Clay_Color | None = ...,
         cornerRadius: Clay_CornerRadius | None = ...,
         aspectRatio: Clay_AspectRatioElementConfig | None = ...,
+        image: Clay_ImageElementConfig | None = ...,
         floating: Clay_FloatingElementConfig | None = ...,
         custom: Clay_CustomElementConfig | None = ...,
         clip: Clay_ClipElementConfig | None = ...,
