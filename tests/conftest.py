@@ -97,3 +97,14 @@ def arena_memory(
     )
     # notice that we save a reference to mem so it doesn't get deallocated
     return arena, mem
+
+
+# --- FACTORIES ---
+
+
+@pytest.fixture
+def validation_enabled_mode() -> None:
+    """Run factory functions with validation enabled."""
+    from pyclay._clay import factories
+
+    factories.set_validation_enabled(True)

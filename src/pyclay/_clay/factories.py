@@ -96,8 +96,8 @@ def _handle_validation_errors(msg: str) -> None:
     :param msg: Message of the error.
     :type msg: str
     """
-    if _error_callback and not _error_callback(msg):
-        raise ValueError(msg)
+    if _error_callback and _error_callback(msg):
+        return
     raise ValueError(msg)
 
 
@@ -122,13 +122,10 @@ def _check_enum_flag_value(
     if not _validation_enabled:
         return
 
-    allowed: int = 0  # bitwise OR of all fields
-    for member in flag_cls:
-        allowed |= member
-    int_val: int = val
-    if int_val & ~allowed:
+    allowed: int = sum(flag_cls)
+    if val < 0 or val & ~allowed:
         _handle_validation_errors(
-            f"{name} must be a valid {flag_cls.__name__}, got {int_val} instead",
+            f"{name} must be a valid {flag_cls.__name__}, got {val} instead",
         )
 
 
