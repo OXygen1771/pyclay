@@ -42,7 +42,7 @@ class LayoutAlignmentY(IntEnum):
     @classmethod
     def default(cls) -> LayoutAlignmentY:
         """Get the default value, as defined in clay.h."""
-        return cls.CENTER
+        return cls.TOP
 
 
 class SizingType(IntEnum):
@@ -80,8 +80,8 @@ class TextAlignment(IntEnum):
     """Controls how text is aligned within an outer text bounding box."""
 
     LEFT = 0
-    CENTER = 0
-    RIGHT = 0
+    CENTER = 1
+    RIGHT = 2
 
     @classmethod
     def default(cls) -> TextAlignment:
