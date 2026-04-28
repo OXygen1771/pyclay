@@ -1,7 +1,8 @@
 """Factories and helpers for creating Clay structures."""
 
 import ctypes
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from enum import IntEnum, IntFlag
 
 from pyclay._clay._lib import clay_ease_out
@@ -32,12 +33,11 @@ from pyclay._clay._types import (
     Clay_StringSlice,
     Clay_TextElementConfig,
     Clay_TransitionCallbackArguments,
-    Clay_TransitionData,
     Clay_TransitionElementConfig,
     Clay_Vector2,
+    transitionHandlerFunction,
 )
 from pyclay.enums import (
-    ExitTransitionSiblingOrdering,
     FloatingAttachPointType,
     FloatingAttachToElement,
     FloatingClipToElement,
@@ -48,8 +48,6 @@ from pyclay.enums import (
     SizingType,
     TextAlignment,
     TextElementConfigWrapMode,
-    TransitionEnterTriggerType,
-    TransitionExitTriggerType,
     TransitionInteractionHandlingType,
     TransitionProperty,
 )
@@ -201,11 +199,13 @@ def make_clay_string(text: str, static: bool = False) -> Clay_String:
     :rtype: Clay_String
     """
     b: bytes = text.encode("utf-8")
-    return Clay_String(
+    s: Clay_String = Clay_String(
         isStaticallyAllocated=static,
         length=len(b),
         chars=b,
     )
+    s._buf_chars = b  # won't be passed to clay
+    return s
 
 
 def make_clay_string_slice(text: str, base: str | None = None) -> Clay_StringSlice:
@@ -220,11 +220,14 @@ def make_clay_string_slice(text: str, base: str | None = None) -> Clay_StringSli
     """
     b: bytes = text.encode("utf-8")
     b_base: bytes = base.encode("utf-8") if base is not None else b
-    return Clay_StringSlice(
+    s: Clay_StringSlice = Clay_StringSlice(
         length=len(b),
         chars=b,
         baseChars=b_base,
     )
+    s._buf_chars = b  # won't be passed to clay
+    s._buf_base = b_base
+    return s
 
 
 def make_clay_arena(capacity: int, memory: bytes | None = None) -> Clay_Arena:
@@ -239,11 +242,17 @@ def make_clay_arena(capacity: int, memory: bytes | None = None) -> Clay_Arena:
     :rtype: Clay_Arena
     """
     _check_size_t(capacity, "Arena capacity (size_t)")
-    return Clay_Arena(
+
+    if memory is None:
+        memory = bytes(capacity)
+
+    a: Clay_Arena = Clay_Arena(
         nextAllocation=0,
         capacity=capacity,
         memory=memory,
     )
+    a._buf_mem = memory  # won't be passed to clay
+    return a
 
 
 def make_clay_dimensions(width: float, height: float) -> Clay_Dimensions:
@@ -336,36 +345,40 @@ def make_clay_element_id(
     return Clay_ElementId(id=id, offset=offset, baseId=base_id, stringId=clay_string)
 
 
-def make_clay_element_id_array(
+@contextmanager
+def clay_element_id_array(
     element_ids: list[Clay_ElementId],
-) -> Clay_ElementIdArray:
-    """Generate a Clay_ElementIdArray from a list of Clay_ElementId.
+) -> Iterator[Clay_ElementIdArray]:
+    """Generate an iterator over a Clay_ElementIdArray from a list of Clay_ElementId.
 
-    Note that you MUST call free_element_id_array() after using the array to avoid
-    memory leaks.
+    This is a context manager, it frees the internal array automatically after exiting.
 
     :param element_ids: List of Clay_ElementId.
     :type element_ids: list[Clay_ElementId]
-    :return: Resulting Clay_ElementIdArray.
-    :rtype: Clay_ElementIdArray
+    :return: Resulting iterator over Clay_ElementIdArray.
+    :rtype: Iterator[Clay_ElementIdArray]
     """
     length: int = len(element_ids)
     if length == 0:
-        return Clay_ElementIdArray(capacity=0, length=0, internalArray=None)
+        yield Clay_ElementIdArray(capacity=0, length=0, internalArray=None)
+        return
 
     array_type: type[ctypes.Array[Clay_ElementId]] = Clay_ElementId * length
     c_array: ctypes.Array[Clay_ElementId] = array_type(*element_ids)
 
-    return Clay_ElementIdArray(
+    arr: Clay_ElementIdArray = Clay_ElementIdArray(
         capacity=length,
         length=length,
         internalArray=ctypes.cast(c_array, ctypes.POINTER(Clay_ElementId)),
     )
-
-
-def free_clay_element_id_array(arr: Clay_ElementIdArray) -> None:
-    """Free the memory allocated by make_clay_element_id_array()."""
-    arr.internalArray = None
+    # this is not passed to C, just an internal reference
+    arr._c_array = c_array
+    try:
+        yield arr
+    finally:
+        arr.internalArray = None
+        del c_array
+        del arr._c_array
 
 
 def make_clay_corner_radius(
@@ -735,15 +748,12 @@ def make_clay_floating_element_config(
 
     _check_int16(z_index, "Z index")
 
-    if (
-        attach_to
-        in (
-            FloatingAttachToElement.ATTACH_TO_PARENT,
-            FloatingAttachToElement.ATTACH_TO_ELEMENT_WITH_ID,
-        )
-        and attach_points is None
+    if attach_to in (
+        FloatingAttachToElement.ATTACH_TO_PARENT,
+        FloatingAttachToElement.ATTACH_TO_ELEMENT_WITH_ID,
     ):
-        attach_points = make_clay_floating_attach_points()
+        if attach_points is None:
+            attach_points = make_clay_floating_attach_points()
         if parent_id is not None:
             _check_uint32(parent_id, "Parent ID")
         else:
@@ -751,6 +761,14 @@ def make_clay_floating_element_config(
                 "When attaching a floating element to something via ID, you must "
                 "specify the ID of the parent element.",
             )
+    else:
+        if attach_points is None:
+            attach_points = Clay_FloatingAttachPoints(
+                FloatingAttachPointType.default(),
+                FloatingAttachPointType.default(),
+            )
+        if parent_id is None:
+            parent_id = 0
 
     return Clay_FloatingElementConfig(
         offset=offset,
@@ -859,19 +877,19 @@ def make_clay_transition_element_config(
     handler: Callable[[Clay_TransitionCallbackArguments], bool] | None = None,
     properties: TransitionProperty | int | None = None,
     interaction_handling: TransitionInteractionHandlingType | int | None = None,
-    enter_trigger: TransitionEnterTriggerType | int | None = None,
-    enter_set_initial_state: Callable[
-        [Clay_TransitionData, TransitionProperty],
-        Clay_TransitionData,
-    ]
-    | None = None,
-    exit_trigger: TransitionExitTriggerType | int | None = None,
-    exit_set_final_state: Callable[
-        [Clay_TransitionData, TransitionProperty],
-        Clay_TransitionData,
-    ]
-    | None = None,
-    sibling_ordering: ExitTransitionSiblingOrdering | int | None = None,
+    # enter_trigger: TransitionEnterTriggerType | int | None = None,
+    # enter_set_initial_state: Callable[
+    #     [Clay_TransitionData, TransitionProperty],
+    #     Clay_TransitionData,
+    # ]
+    # | None = None,
+    # exit_trigger: TransitionExitTriggerType | int | None = None,
+    # exit_set_final_state: Callable[
+    #     [Clay_TransitionData, TransitionProperty],
+    #     Clay_TransitionData,
+    # ]
+    # | None = None,
+    # sibling_ordering: ExitTransitionSiblingOrdering | int | None = None,
 ) -> Clay_TransitionElementConfig:
     """Generate a Clay_TransitionElementConfig.
 
@@ -907,6 +925,7 @@ def make_clay_transition_element_config(
     _check_float_nonnegative(duration, "Transition duration")
     if handler is None:
         handler = clay_ease_out
+    handler_c_func = transitionHandlerFunction(handler)
     if properties is None:
         properties = TransitionProperty.default()
     elif not isinstance(properties, TransitionProperty):
@@ -922,81 +941,88 @@ def make_clay_transition_element_config(
         )
         interaction_handling = TransitionInteractionHandlingType(interaction_handling)
 
-    enter_: Clay_TransitionElementConfig._enter | None = None
-    exit_: Clay_TransitionElementConfig._exit | None = None
+    enter_ = Clay_TransitionElementConfig._enter()
+    exit_ = Clay_TransitionElementConfig._exit()
 
-    if enter_set_initial_state is not None:
-        if enter_trigger is None:
-            enter_trigger = TransitionEnterTriggerType.default()
-        elif not isinstance(enter_trigger, TransitionEnterTriggerType):
-            _check_enum_value(
-                enter_trigger,
-                TransitionEnterTriggerType,
-                "Enter trigger",
-            )
-            enter_trigger = TransitionEnterTriggerType(enter_trigger)
+    ##################
+    ### TURNS OUT! ###  # noqa: E266
+    ##################
+    # ctypes doesn't support returning complex structures like Clay_TransitionData, so
+    # the users can't define their setInitialState and setFinalState functions in Python
+    # unfortunately.
 
-        # check user callback arguments
-        def _enter_wrapper(
-            target_state: Clay_TransitionData,
-            raw_properties: ctypes.c_uint32,
-        ) -> Clay_TransitionData:
-            _check_enum_flag_value(
-                int(raw_properties),
-                TransitionProperty,
-                "Transition property in user defined enter_set_initial_state()",
-            )
-            properties: TransitionProperty = TransitionProperty(raw_properties)
-            return enter_set_initial_state(target_state, properties)
+    # if enter_set_initial_state is not None:
+    #     if enter_trigger is None:
+    #         enter_trigger = TransitionEnterTriggerType.default()
+    #     elif not isinstance(enter_trigger, TransitionEnterTriggerType):
+    #         _check_enum_value(
+    #             enter_trigger,
+    #             TransitionEnterTriggerType,
+    #             "Enter trigger",
+    #         )
+    #         enter_trigger = TransitionEnterTriggerType(enter_trigger)
 
-        enter_ = Clay_TransitionElementConfig._enter()
-        enter_.trigger = enter_trigger
-        enter_.setInitialState = Clay_TransitionElementConfig._enter.setInitialState(
-            _enter_wrapper,
-        )
+    #     # check user callback arguments
+    #     @ctypes.CFUNCTYPE(Clay_TransitionData, Clay_TransitionData, ctypes.c_uint32)
+    #     def _enter_wrapper(
+    #         target_state: Clay_TransitionData,
+    #         raw_properties: ctypes.c_uint32,
+    #     ) -> Clay_TransitionData:
+    #         _check_enum_flag_value(
+    #             int(raw_properties),
+    #             TransitionProperty,
+    #             "Transition property in user defined enter_set_initial_state()",
+    #         )
+    #         properties: TransitionProperty = TransitionProperty(raw_properties)
+    #         return enter_set_initial_state(target_state, properties)
 
-    if exit_set_final_state is not None:
-        if exit_trigger is None:
-            exit_trigger = TransitionExitTriggerType.default()
-        elif not isinstance(exit_trigger, TransitionExitTriggerType):
-            _check_enum_value(
-                exit_trigger,
-                TransitionExitTriggerType,
-                "Exit trigger",
-            )
-            exit_trigger = TransitionExitTriggerType(exit_trigger)
-        if sibling_ordering is None:
-            sibling_ordering = ExitTransitionSiblingOrdering.default()
-        elif not isinstance(sibling_ordering, ExitTransitionSiblingOrdering):
-            _check_enum_value(
-                sibling_ordering,
-                ExitTransitionSiblingOrdering,
-                "Sibling exit ordering",
-            )
-            sibling_ordering = ExitTransitionSiblingOrdering(sibling_ordering)
+    #     enter_.trigger = enter_trigger
+    #     enter_.setInitialState = Clay_TransitionElementConfig._enter.setInitialState(
+    #         enter_set_initial_state,
+    #     )
 
-        # check user callback arguments
-        def _exit_wrapper(
-            target_state: Clay_TransitionData,
-            raw_properties: ctypes.c_uint32,
-        ) -> Clay_TransitionData:
-            _check_enum_flag_value(
-                int(raw_properties),
-                TransitionProperty,
-                "Transition property in user defined exit_set_final_state()",
-            )
-            properties: TransitionProperty = TransitionProperty(raw_properties)
-            return exit_set_final_state(target_state, properties)
+    # if exit_set_final_state is not None:
+    #     if exit_trigger is None:
+    #         exit_trigger = TransitionExitTriggerType.default()
+    #     elif not isinstance(exit_trigger, TransitionExitTriggerType):
+    #         _check_enum_value(
+    #             exit_trigger,
+    #             TransitionExitTriggerType,
+    #             "Exit trigger",
+    #         )
+    #         exit_trigger = TransitionExitTriggerType(exit_trigger)
+    #     if sibling_ordering is None:
+    #         sibling_ordering = ExitTransitionSiblingOrdering.default()
+    #     elif not isinstance(sibling_ordering, ExitTransitionSiblingOrdering):
+    #         _check_enum_value(
+    #             sibling_ordering,
+    #             ExitTransitionSiblingOrdering,
+    #             "Sibling exit ordering",
+    #         )
+    #         sibling_ordering = ExitTransitionSiblingOrdering(sibling_ordering)
 
-        exit_ = Clay_TransitionElementConfig._exit()
-        exit_.trigger = exit_trigger
-        exit_.setFinalState = Clay_TransitionElementConfig._exit.setFinalState(
-            _exit_wrapper,
-        )
-        exit_.siblingOrdering = sibling_ordering
+    #     # check user callback arguments
+    #     @ctypes.CFUNCTYPE(Clay_TransitionData, Clay_TransitionData, ctypes.c_uint32)
+    #     def _exit_wrapper(
+    #         target_state: Clay_TransitionData,
+    #         raw_properties: ctypes.c_uint32,
+    #     ) -> Clay_TransitionData:
+    #         _check_enum_flag_value(
+    #             int(raw_properties),
+    #             TransitionProperty,
+    #             "Transition property in user defined exit_set_final_state()",
+    #         )
+    #         properties: TransitionProperty = TransitionProperty(raw_properties)
+    #         return exit_set_final_state(target_state, properties)
+
+    #     exit_.trigger = exit_trigger
+    #     exit_.setFinalState = Clay_TransitionElementConfig._exit.setFinalState(
+    #         _exit_wrapper,
+    #     )
+    #     exit_.siblingOrdering = sibling_ordering
 
     return Clay_TransitionElementConfig(
-        handler=handler,
+        handler=handler_c_func,
         duration=duration,
         properties=properties,
         interactionHandling=interaction_handling,
@@ -1011,6 +1037,7 @@ def make_clay_element_declaration(
     overlay_color: Clay_Color | None = None,
     corner_radius: Clay_CornerRadius | None = None,
     aspect_ratio: Clay_AspectRatioElementConfig | None = None,
+    image: Clay_ImageElementConfig | None = None,
     floating: Clay_FloatingElementConfig | None = None,
     custom: Clay_CustomElementConfig | None = None,
     clip: Clay_ClipElementConfig | None = None,
@@ -1030,6 +1057,8 @@ def make_clay_element_declaration(
     :type corner_radius: Clay_CornerRadius
     :param aspect_ratio: Desired aspect ratio of the element (optional).
     :type aspect_ratio: Clay_AspectRatioElementConfig
+    :param image: Configuration of an image.
+    :type image: Clay_ImageElementConfig
     :param floating: Controls element floating (optional).
     :type floating: Clay_FloatingElementConfig
     :param custom: Configuration for the CUSTOM render command (optional).
@@ -1045,12 +1074,33 @@ def make_clay_element_declaration(
     :return: Resulting Clay_TransitionElementConfig.
     :rtype: Clay_TransitionElementConfig
     """
+    if overlay_color is None:
+        overlay_color = Clay_Color()
+    if corner_radius is None:
+        corner_radius = Clay_CornerRadius()
+    if aspect_ratio is None:
+        aspect_ratio = Clay_AspectRatioElementConfig()
+    if image is None:
+        image = Clay_ImageElementConfig()
+    if floating is None:
+        floating = Clay_FloatingElementConfig()
+    if custom is None:
+        custom = Clay_CustomElementConfig()
+    if clip is None:
+        clip = Clay_ClipElementConfig()
+    if border is None:
+        border = Clay_BorderElementConfig()
+    if transition is None:
+        transition = Clay_TransitionElementConfig()
+    if user_data is None:
+        user_data = ctypes.c_void_p()
     return Clay_ElementDeclaration(
         layout=layout,
         backgroundColor=background_color,
         overlayColor=overlay_color,
         cornerRadius=corner_radius,
         aspectRatio=aspect_ratio,
+        image=image,
         floating=floating,
         custom=custom,
         clip=clip,
